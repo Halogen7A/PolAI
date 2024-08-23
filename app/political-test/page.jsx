@@ -3,11 +3,15 @@
 import { useState, useEffect } from 'react';
 import { calculateLeaning } from '../server-actions/calculatePoliticalLeaning';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation';
+import { saveTest } from '../server-actions/saveTest';
 
 const PoliticalTestPage = () => {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
   const [result, setResult] = useState(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const storedQuestions = typeof window !== 'undefined' ? localStorage.getItem('politicalTestQuestions') : null;
@@ -29,6 +33,19 @@ const PoliticalTestPage = () => {
       setResult(result);
     } catch (error) {
       console.error('Failed to calculate political leaning:', error);
+    }
+  };
+
+  const saveResultHandler = async () => {
+    try {
+      await saveTest({
+        questions,
+        answers: Object.values(responses),
+        result,
+      });
+      router.push('/profile');
+    } catch (error) {
+      console.error('Failed to save test result:', error);
     }
   };
 
@@ -69,13 +86,13 @@ const PoliticalTestPage = () => {
             <h3 className="text-xl mb-4">Your Political Leaning: {result}</h3>
             <div className="flex space-x-4">
               <button
-                onClick={() => alert('Save result')}
+                onClick={saveResultHandler}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded transition duration-300 ease-in-out"
               >
                 Save Result
               </button>
               <button
-                onClick={() => alert('Delete result')}
+                onClick={() => router.push('/profile')}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-300 ease-in-out"
               >
                 Do Not Save

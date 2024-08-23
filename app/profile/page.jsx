@@ -1,28 +1,36 @@
 import { cookies } from "next/headers";
 import IdeaForm from "../components/IdeaList";
 import UpdateIdea from "../components/UpdateIdea";
-import {deleteIdea} from "../server-actions/deleteIdea"
+import { deleteIdea } from "../server-actions/deleteIdea";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import PoliticalTestButton from "../components/Test";
+import ExpandableResult from "../components/ExpandableResult";
 
 export default async function Profile() {
-
     const cookieStore = cookies();
-    const supabase = createServerComponentClient({cookies: () => cookieStore});
-    const { data: { user }} = await supabase.auth.getUser();
+    const supabase = createServerComponentClient({ cookies: () => cookieStore });
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const {data: ideas, error} = await supabase
+    const { data: ideas, error } = await supabase
         .from('pols')
         .select('*')
         .eq('user_id', user.id)
-        .order('idea', {ascending: true})
+        .order('idea', { ascending: true });
 
     if (error) {
-        console.error("Error fetching ideas")
+        console.error("Error fetching ideas");
     }
 
-    console.log(ideas)
-    
+    const { data: testResults, error: testError } = await supabase
+        .from('political_tests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+    if (testError) {
+        console.error("Error fetching political test results");
+    }
+
     return (
         <div className="min-h-screen bg-gray-900 text-white p-6 dark:bg-gray-900 dark:text-white">
             <div className="max-w-screen-xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6 dark:bg-gray-800 dark:border-gray-700">
@@ -35,8 +43,8 @@ export default async function Profile() {
                         Sign Out
                     </button>
                 </form>
-                <PoliticalTestButton/>
-                <h1 class="text-4xl font-bold text-center my-4">Add an Idea!</h1>
+                <PoliticalTestButton />
+                <h1 className="text-4xl font-bold text-center my-4">Add an Idea!</h1>
                 <br></br>
                 <IdeaForm />
                 <div className="mt-8 space-y-4">
@@ -60,6 +68,12 @@ export default async function Profile() {
                                 <UpdateIdea idea={idea} />
                             </div>
                         </div>
+                    ))}
+                </div>
+                <div className="mt-8 space-y-4">
+                <h2 className="text-2xl font-bold mb-4">Saved Political Tests</h2>
+                    {testResults.map((test) => (
+                        <ExpandableResult key={test.id} test={test} />
                     ))}
                 </div>
             </div>

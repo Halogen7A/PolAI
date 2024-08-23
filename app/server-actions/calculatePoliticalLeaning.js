@@ -8,7 +8,7 @@ export async function calculateLeaning(responses) {
         dangerouslyAllowBrowser: true
       });
 
-  const prompt = `Given the following responses, determine the user's political leaning: ${JSON.stringify(responses)}`;
+  const prompt = `Given the following responses, determine the user's political leaning in one sentence: ${JSON.stringify(responses)}`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
