@@ -22,4 +22,3 @@ export async function GET(req) {
     }
     return NextResponse.redirect(new URL('/profile', req.url))
 }
-}
