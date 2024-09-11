@@ -8,14 +8,18 @@ export async function GET(req) {
 
     const {searchParams} = new URL(req.url)
 
-    const accessToken = searchParams.get('access_token'); // Updated parameter
+    const code = searchParams.get('code')
 
-    if (accessToken) {
-        const { error } = await supabase.auth.exchangeCodeForSession(accessToken);
+    if(code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(accessToken);
         if (error) {
             console.error('Error exchanging token for session:', error);
-            return NextResponse.redirect(new URL('/', req.url)); // Redirect to login on error
         }
+        else {
+            console.log('Session data:', data);
+        }
+
     }
     return NextResponse.redirect(new URL('/profile', req.url))
+}
 }

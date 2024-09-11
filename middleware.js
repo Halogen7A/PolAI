@@ -9,11 +9,13 @@ export async function middleware(req) {
 
     // Authenticated user trying to access home page
     if (user && req.nextUrl.pathname === '/') {
+        console.log("Not Authenticated!");
         return NextResponse.redirect(new URL('/profile', req.url));
     }
 
     // Unauthenticated user trying to access profile page
     if (!user && req.nextUrl.pathname === '/profile') {
+        console.log("Not Authenticated!");
         return NextResponse.redirect(new URL('/', req.url));
     }
 
