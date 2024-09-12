@@ -11,7 +11,7 @@ export async function GET(req) {
     const code = searchParams.get('code')
 
     if(code) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(accessToken);
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) {
             console.error('Error exchanging token for session:', error);
         }
